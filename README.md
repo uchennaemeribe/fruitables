@@ -728,7 +728,7 @@ GitHub Repository
 Payload URL:
 
 ```text
-http://YOUR_PUBLIC_IP:8080/github-webhook/
+http://3.80.196.157:8080/github-webhook/
 ```
 
 Content type:
@@ -736,9 +736,9 @@ Content type:
 ```text
 application/json
 ```
+2. Save webhook.
 
-Save webhook.
-
+![GitHub Webhook Configuration](screenshots/github-webhook-configuration.png)
 ---
 
 # PHASE 9 — TEST CI/CD PIPELINE
