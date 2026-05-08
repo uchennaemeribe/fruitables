@@ -1,0 +1,68 @@
+digraph Jenkins_AWS_CICD {
+    rankdir=TB;
+    fontname="Arial";
+
+    node [
+        shape=box,
+        style=filled,
+        fontname="Arial"
+    ];
+
+    github [
+        label="GitHub Repository\n(Forked Website Repo)",
+        fillcolor="lightblue"
+    ];
+
+    webhook [
+        label="GitHub Webhook",
+        fillcolor="lightyellow"
+    ];
+
+    jenkins [
+        label="Jenkins Server\n(AWS EC2 Ubuntu)",
+        fillcolor="orange"
+    ];
+
+    apache [
+        label="Apache Web Server",
+        fillcolor="lightyellow"
+    ];
+
+    deploy [
+        label="/var/www/html/myapp",
+        fillcolor="lightgrey"
+    ];
+
+    route53 [
+        label="AWS Route 53 DNS\nauemeribetech.com.ng",
+        fillcolor="lightcyan"
+    ];
+
+    domain [
+        label="Custom Domain\nwww.auemeribetech.com.ng\nHTTPS Enabled",
+        fillcolor="lightcyan"
+    ];
+
+    users [
+        label="End Users",
+        shape=ellipse,
+        fillcolor="lightgreen"
+    ];
+
+    github -> webhook;
+    webhook -> jenkins;
+    jenkins -> apache;
+    apache -> deploy;
+    deploy -> route53;
+    route53 -> domain;
+    domain -> users;
+
+    subgraph cluster_aws {
+        label="Amazon Web Services";
+        style=dashed;
+
+        jenkins;
+        apache;
+        route53;
+    }
+}
