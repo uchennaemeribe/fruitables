@@ -1677,6 +1677,14 @@ dist/
 ![Setup for .gitignore](screenshots/setup-for-.gitignore.png)
 ---
 
+## Updating GitHub Repo
+``bash
+git add .
+git commit -m "Update Project" 
+git push origin main
+
+![Setup for .gitignore](screenshots/updating-github-repo.png)
+
 # Cleanup Resources
 
 Terminate EC2 instance after testing to avoid charges.
