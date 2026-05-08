@@ -1,0 +1,18 @@
+{
+  "Comment": "Root domain record",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "auemeribetech.com.ng",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "3.80.196.157"
+          }
+        ]
+      }
+    }
+  ]
+}

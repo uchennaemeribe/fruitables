@@ -756,20 +756,254 @@ git add .
 git commit -m "Test Jenkins deployment"
 git push origin main
 ```
+![GitHub refspec error](screenshots/Git-refspec-error.png)
 
+# Troubleshooting — Git Branch Name (`master` → `main`) for Jenkins CI/CD
+
+## Problem
+
+The original `fruitables` repository was configured with:
+
+```text
+master
+```
+
+But the local repository and CI/CD pipeline were later changed to:
+
+```text
+main
+```
+
+This caused Jenkins build failures because Jenkins was still trying to pull from the old `master` branch.
+
+Common errors include:
+
+```text
+Couldn't find any revision to build
+```
+
+or
+
+```text
+ERROR: Couldn't find remote ref refs/heads/master
+```
+
+---
+
+# Step 1 — Verify Current Branch
+
+Run locally:
+
+```bash
+git branch
+```
+
+Expected output:
+
+```text
+* main
+```
+
+---
+
+# Step 2 — Rename Branch from master to main
+
+If still on `master`, rename it:
+
+```bash
+git branch -M main
+```
+
+---
+
+# Step 3 — Push Updated Branch to GitHub
+
+Push the renamed branch:
+
+```bash
+git push -u origin main
+```
+
+---
+
+# Step 4 — Verify GitHub Default Branch
+
+Go to:
+
+```text
+GitHub Repository → Settings → Default Branch
+```
+
+Ensure:
+
+```text
+main
+```
+
+is selected.
+
+If GitHub still shows `master`:
+
+![Configuration of Default from Master to Main](screenshots/master-branch-default-change.png)
+
+1. Change default branch to `main`
+2. Save changes
+3. Confirm that `main` works
+
+![Configuration of Main Branch Functionality](screenshots/successful-main-branch-functionality.png)
+---
+![Saved Changes for Main Branch Default Setting](screenshots/main-branch.png)
+
+# Step 5 — Delete Old master Branch (Optional)
+
+After confirming `main` works:
+
+```bash
+git push origin --delete master
+```
+![Confirmation of Master Branch Delete](screenshots/master-branch-delete-confirmation.png)
+
+This prevents Jenkins confusion later.
+
+---
+
+# Step 6 — Update Jenkins Job Configuration
+
+Open Jenkins:
+
+```text
+http://3.80.196.157:8080:8080
+```
+
+Go to:
+
+```text
+Dashboard → deploy-static-site → Configure
+```
+
+---
+
+# Step 7 — Update Git Branch in Jenkins
+
+Under:
+
+```text
+Source Code Management → Git
+```
+
+Locate:
+
+```text
+Branches to build
+```
+
+Replace:
+
+```text
+*/master
+```
+
+with:
+
+```text
+*/main
+```
+
+---
+
+# Step 8 — Save Jenkins Configuration
+
+Scroll down and click:
+
+```text
+Save
+```
+![Updated Git Branch Configuration in Jenkins](screenshots/jenkins-git-branch-update.png)
+---
+
+# Step 9 — Test Jenkins Build
+
+Click:
+
+```text
+Build Now
+```
+
+Expected result:
+
+```text
+SUCCESS
+```
+![Successful Testing of Jenkins Build](screenshots/jenkins-build-test.png)
+---
+
+# Step 10 — Verify Automatic Deployment
+
+1. Make a small website change locally in the index.html.
+
+Example:
+From:
+```html
+<h1>CI/CD ACTIVATED By Nov Friends!!! Organic Veggies & Fruits Foods 🚀</h1>
+```
+To:
+```html
+<h1>CI/CD ACTIVATED By Anthony Uchenna Emeribe!!! Organic Veggies & Fruits Foods 🚀</h1>
+```
+2. Save the updated inde.html
+
+3. Commit and push:
+
+```bash
+git add .
+git commit -m "Test automatic deployment"
+git push origin main
+```
+![Automatic Deployment Verification](screenshots/automatic-deployment-verification.png)
+---
+
+# Step 11 — Verify GitHub Webhook
+
+Go to:
+
+```text
+GitHub Repository → Settings → Webhooks
+```
+
+Expected webhook:
+
+```text
+http://YOUR_PUBLIC_IP:8080/github-webhook/
+```
+
+Status should display:
+
+```text
+Recent Deliveries → 200 OK
+```
+![GitHub Webhook Verification](screenshots/github-webhook-verification.png)
+---
+
+# Step 12 — Verify Live Deployment
+
+Open browser:
+
+```text
+http://3.80.196.157/myapp
 ---
 
 ## Step 31 — Verify Jenkins Build
 
-Go to:
+1. Go to:
 
 ```text
 Jenkins Dashboard
 → Build History
 ```
 
-The build should trigger automatically.
+2. The build should trigger automatically.
 
+![Jenkins Build Verification](screenshots/jenkins-build-verification.png)
 ---
 
 ## Step 32 — Verify Website Deployment
@@ -777,9 +1011,9 @@ The build should trigger automatically.
 Visit:
 
 ```text
-http://YOUR_PUBLIC_IP/myapp
+http://3.80.196.157/myapp
 ```
-
+![Website Deployment Verification](screenshots/website-deployment-verification.png)
 ---
 
 # PHASE 10 — CONFIGURE AWS ROUTE 53 DNS
@@ -789,11 +1023,9 @@ http://YOUR_PUBLIC_IP/myapp
 ## Step 33 — Create Hosted Zone
 
 ```bash
-aws route53 create-hosted-zone \
-    --name auemeribetech.com.ng \
-    --caller-reference "$(date)"
+aws route53 create-hosted-zone --name auemeribetech.com.ng --caller-reference "$(date)"
 ```
-
+![Hosted Zone Creation](screenshots/hosted-zone-creation.png)
 ---
 
 ## Step 34 — Get Route 53 Nameservers
@@ -801,34 +1033,160 @@ aws route53 create-hosted-zone \
 ```bash
 aws route53 list-hosted-zones
 ```
+![Hosted Zone ID Retrieval](screenshots/hosted-zone-id-retrieval.png)
 
 Then:
 
 ```bash
-aws route53 get-hosted-zone \
-    --id HOSTED_ZONE_ID
+aws route53 get-hosted-zone --id HOSTED_ZONE_ID
 ```
-
+![Route 53 Nameservers Retrieval](screenshots/route-53-nameservers-retrieval.png)
 Copy the Route 53 nameservers.
 
 ---
 
 ## Step 35 — Update Domain Registrar Nameservers
 
-Go to:
+1. Go to:
 - QServers
 - Namecheap
 - GoDaddy
 
-Replace existing nameservers with Route 53 nameservers.
+Replace existing nameservers with AWS nameservers.
 
-Wait for DNS propagation.
+![Domain Registrar Update Using Nameservers](screenshots/domain-registrar-update-with-nameservers.png)
+
+2. Wait for propagation
+
+3. After approximately 10–15 minutes, verify that the domain is now using AWS DNS nameservers.
+
+Run:
+
+```bash
+dig auemeribetech.com.ng NS
+```
+![Domain Verification on Using Nameservers](screenshots/domain-nameserver-verification.png)
 
 ---
 
-## Step 36 — Create Root Domain A Record
+# Step 36 — Create Root Domain A Record Using AWS CLI
+
+This step connects your custom domain:
+
+```text
+auemeribetech.com.ng
+```
+
+to your AWS EC2 Instance Public IP using AWS Route 53 DNS.
+
+The A Record tells Route 53:
+
+```text
+"When users visit auemeribetech.com.ng,
+send traffic to this server IP address."
+```
+
+---
+
+# Prerequisites
+
+Before proceeding, ensure you already have:
+
+- AWS CLI installed
+- AWS CLI configured
+- Route 53 Hosted Zone created
+- AWS EC2 Instance running
+- Public IP address available
+
+---
+
+# 1 — Verify AWS CLI Configuration
+
+Run:
+
+```bash
+aws sts get-caller-identity
+```
+
+If configured properly, AWS returns your:
+
+- Account ID
+- User ARN
+- User ID
+
+![AWS CLI Configuration Verification](screenshots/aws-cli-configuration-verification.png)
+---
+
+# 2 — Get Your AWS EC2 Instance Public IP
+
+Run:
+
+```bash
+aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicIpAddress" --output text
+```
+
+Example output:
+
+```text
+3.80.196.157
+```
+
+Save this IP.
+
+You will use it in the DNS record.
+![EC2 Instance Public IP Retrieval](screenshots/ec2-public-ip-retrieval.png)
+---
+
+# 3 — Get Hosted Zone ID
+
+List Route 53 Hosted Zones:
+
+```bash
+aws route53 list-hosted-zones
+```
+
+Example output:
+
+```json
+{
+  "HostedZones": [
+    {
+      "Id": "/hostedzone/Z04577001PKHX4712KXO",
+      "Name": "auemeribetech.com.ng."
+    }
+  ]
+}
+```
+
+Copy ONLY:
+
+```text
+Z04577001PKHX4712KXO
+```
+
+This is your HOSTED_ZONE_ID:
+
+```text
+Z04577001PKHX4712KXO
+```
+![Host Zone ID Retrieval](screenshots/host-zone-id-retrieval.png)
+---
+
+# 4 — Create Root Domain DNS Configuration File
 
 Create:
+
+```text
+root-record.json
+```
+
+Run:
+
+```bash
+nano root-record.json
+```
+
+Paste:
 
 ```json
 {
@@ -842,7 +1200,7 @@ Create:
         "TTL": 300,
         "ResourceRecords": [
           {
-            "Value": "YOUR_PUBLIC_IP"
+            "Value": "3.80.196.157"
           }
         ]
       }
@@ -851,25 +1209,317 @@ Create:
 }
 ```
 
-Save as:
+Save and exit:
+
+Mac/Linux:
 
 ```text
-root-record.json
+CTRL + O
+ENTER
+CTRL + X
 ```
+![Root DOmain DNS Configuration File Creation](screenshots/root-domain-dns-configuration-file-creation.png)
+---
 
-Apply:
+# 5 — Apply DNS Record Using AWS CLI
+
+Run:
 
 ```bash
-aws route53 change-resource-record-sets \
-    --hosted-zone-id HOSTED_ZONE_ID \
-    --change-batch file://root-record.json
+aws route53 change-resource-record-sets --hosted-zone-id Z04577001PKHX4712KXO --change-batch file://root-record.json
 ```
+
+---
+
+# 7 — Verify Successful DNS Update
+
+Successful output looks like:
+
+```json
+{
+  "ChangeInfo": {
+    "Id": "/change/C09770876S7K40T2QYU9",
+    "Status": "PENDING"
+  }
+}
+```
+
+This means:
+
+```text
+AWS Route 53 accepted the DNS record.
+```
+![Successful DNS Update Verification](screenshots/successful-dns-update-verification-status.png)
+---
+
+# 8 — Wait for DNS Propagation
+
+DNS propagation may take:
+
+- 1 minute
+- 5 minutes
+- Sometimes longer
+
+# Verify DNS Propagation Completion
+
+After creating your Route 53 DNS records, AWS first sets the status to:
+
+```json
+{
+  "ChangeInfo": {
+    "Status": "PENDING"
+  }
+}
+```
+
+This means:
+
+```text
+AWS accepted your DNS configuration,
+but global DNS propagation is still in progress.
+```
+
+You must now verify that propagation is completed successfully.
+
+---
+
+# Method 1 — Verify Using AWS CLI (Recommended)
+
+Run:
+
+```bash
+aws route53 get-change --id /change/C09770876S7K40T2QYU9
+```
+---
+
+# Successful DNS Propagation Output
+
+When propagation completes successfully, AWS returns:
+
+```json
+{
+  "ChangeInfo": {
+    "Id": "/change/C09770876S7K40T2QYU9",
+    "Status": "INSYNC"
+  }
+}
+```
+![Successful DNS Propagation Output](screenshots/successful-dns-propagation-output.png)
+---
+
+# Meaning of INSYNC
+
+```text
+INSYNC = DNS propagation completed successfully.
+```
+
+This means:
+
+- Route 53 distributed the DNS record globally
+- DNS servers can now resolve your domain
+- Your custom domain is now active
+
+---
+
+# Method 2 — Verify Using nslookup
+
+Run:
+
+```bash
+nslookup auemeribetech.com.ng
+```
+
+Successful output example:
+
+```text
+Name:    auemeribetech.com.ng
+Address: 3.80.196.157
+```
+![Successful DNS Propagation Output Using NSLOOPUP](screenshots/dns-propagation-verification-using-nsloopup.png)
+---
+
+# Method 3 — Verify Using dig
+
+Run:
+
+```bash
+dig auemeribetech.com.ng
+```
+
+Look for:
+
+```text
+ANSWER SECTION:
+auemeribetech.com.ng. 300 IN A 3.80.196.157
+```
+
+This confirms DNS propagation completed.
+
+![Successful DNS Propagation Output Using Dig](screenshots/dns-propagation-verification-using-dig.png)
+---
+
+# Method 4 — Verify in Browser
+
+Open:
+
+```text
+http://auemeribetech.com.ng
+```
+
+OR
+
+```text
+https://auemeribetech.com.ng
+```
+
+If the application loads successfully:
+
+```text
+DNS propagation completed successfully.
+```
+
+---
+
+# Method 5 — Verify Route 53 Console
+
+Go to:
+
+```text
+AWS Console
+→ Route 53
+→ Hosted Zones
+→ auemeribetech.com.ng
+```
+
+Verify that:
+
+- Root A Record exists
+- Value points to your server IP
+- Status is healthy
+
+---
+
+# Important DNS Propagation Reality
+
+Even after AWS shows:
+
+```text
+INSYNC
+```
+
+some internet providers may still cache old DNS temporarily.
+
+This is normal.
+
+---
+
+# 9 — Test Root Domain
+
+Open browser:
+
+```text
+http://auemeribetech.com.ng
+```
+
+![Successful DNS Propagation Output Using Domain Name on the Browser](screenshots/dns-propagation-verification-using-domain-name.png)
+
+If DNS propagated successfully, your application loads.
+
+---
+
+# Professional Explanation
+
+This command:
+
+```bash
+aws route53 change-resource-record-sets
+```
+
+tells AWS Route 53 to:
+
+- create
+- update
+- or replace
+
+DNS records inside a Hosted Zone.
+
+---
+
+# Explanation of DNS JSON Structure
+
+## Comment
+
+```json
+"Comment": "Root domain record"
+```
+
+Human-readable description.
+
+---
+
+## Action
+
+```json
+"Action": "UPSERT"
+```
+
+Meaning:
+
+- Create record if it doesn't exist
+- Update record if it already exists
+
+---
+
+## Record Type
+
+```json
+"Type": "A"
+```
+
+An A Record maps:
+
+```text
+Domain → IPv4 Address
+```
+
+---
+
+## TTL
+
+```json
+"TTL": 300
+```
+
+DNS cache duration in seconds.
+
+300 seconds = 5 minutes.
+
+---
+
+## ResourceRecords
+
+```json
+"Value": "3.80.196.157"
+```
+
+This is your AWS EC2 Instance Public IP.
 
 ---
 
 ## Step 37 — Create WWW Record
 
-Create:
+
+1. Create:
+
+```text
+www-record.json
+```
+
+2. Run:
+
+```bash
+nano www-record.json
+```
 
 ```json
 {
@@ -883,7 +1533,7 @@ Create:
         "TTL": 300,
         "ResourceRecords": [
           {
-            "Value": "YOUR_PUBLIC_IP"
+            "Value": "3.80.196.157"
           }
         ]
       }
@@ -892,20 +1542,21 @@ Create:
 }
 ```
 
-Save as:
+3. Save and exit:
 
 ```text
-www-record.json
+CTRL + O
+Y
+Enter
 ```
+![WWW Record Creation](screenshots/www-record-creation.png)
 
-Apply:
+4. Apply:
 
 ```bash
-aws route53 change-resource-record-sets \
-    --hosted-zone-id HOSTED_ZONE_ID \
-    --change-batch file://www-record.json
+aws route53 change-resource-record-sets --hosted-zone-id Z04577001PKHX4712KXO --change-batch file://www-record.json
 ```
-
+![Applied WWW Record Creation](screenshots/applied-www-record-creation.png)
 ---
 
 # PHASE 11 — ENABLE HTTPS
@@ -914,10 +1565,16 @@ aws route53 change-resource-record-sets \
 
 ## Step 38 — Install Certbot
 
+1. Log into EC2 instance
+```bash
+ssh -i jenkins-key.pem ubuntu@3.80.196.157
+```
+
+2. Install Cerbot by running:
 ```bash
 sudo apt install certbot python3-certbot-apache -y
 ```
-
+![Certbot Installation](screenshots/certbot-installation.png)
 ---
 
 ## Step 39 — Configure SSL
@@ -940,7 +1597,7 @@ Visit:
 ```text
 https://www.auemeribetech.com.ng
 ```
-
+![HTTPS Verification](screenshots/https-verification.png)
 Your website should now be secured.
 
 ---
@@ -1007,15 +1664,17 @@ Create:
 Add:
 
 ```gitignore
-node_modules/
+
+```
+Cloud / DevOps Engineernode_modules/
 .env
 .DS_Store
 *.pem
 *.log
 coverage/
 dist/
-```
 
+![Setup for .gitignore](screenshots/setup-for-.gitignore.png)
 ---
 
 # Cleanup Resources
@@ -1027,5 +1686,3 @@ Terminate EC2 instance after testing to avoid charges.
 # Author
 
 Anthony Uchenna Emeribe
-
-Cloud / DevOps Engineer
