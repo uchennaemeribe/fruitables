@@ -950,7 +950,7 @@ To:
 ```html
 <h1>CI/CD ACTIVATED By Anthony Uchenna Emeribe!!! Organic Veggies & Fruits Foods 🚀</h1>
 ```
-2. Save the updated inde.html
+2. Save the updated index.html
 
 3. Commit and push:
 
@@ -1588,6 +1588,7 @@ Choose:
 - www.auemeribetech.com.ng
 - Redirect HTTP to HTTPS
 
+![SSL Configuration](screenshots/ssl-configuration.png)
 ---
 
 ## Step 40 — Verify HTTPS
@@ -1595,11 +1596,92 @@ Choose:
 Visit:
 
 ```text
-https://www.auemeribetech.com.ng
+https://auemeribetech.com.ng/myapp/
 ```
 ![HTTPS Verification](screenshots/https-verification.png)
 Your website should now be secured.
 
+
+---
+
+## PHASE 12 — PUSH FINAL PROJECT TO GITHUB 
+
+# .gitignore
+
+Create:
+
+```text
+.gitignore
+```
+
+Add:
+
+```gitignore
+```
+Cloud / DevOps Engineernode_modules/
+.env
+.DS_Store
+*.pem
+*.log
+coverage/
+dist/
+
+![Setup for .gitignore](screenshots/setup-for-.gitignore.png)
+
+1. Add Files
+```bash
+git add .
+```
+2. Commit
+```bash
+git commit -m "Update Project" 
+```
+
+3.  Push (Note that initialization and commit was earlier done)
+```bash
+git push origin main
+```
+![Setup for .gitignore](screenshots/updating-github-repo.png)
+
+# Cleanup Resources
+
+Terminate EC2 instance after testing to avoid charges.
+
+1. Get instance id
+``bash
+aws ec2 describe-instances --query "Reservations[*].Instances[*].InstanceId" --output text
+``
+![Retrieval of EC2 Instance ID](screenshots/instance-id-retrieval.png)
+
+2. Terminate EC2 Instance
+``bash
+aws ec2 terminate-instances --instance-ids i-080041005ef5027cd
+``
+![Termination of EC2 Instance](screenshots/ec2-instance-termination.png)
+
+3. Verify Termination
+``bash
+aws ec2 describe-instances --instance-ids i-0abc1234def567890 --query "Reservations[*].Instances[*].State.Name"
+``
+![Termination of EC2 Instance](screenshots/termination-verified.png)
+
+4.  Delete Security Group
+```bash
+aws ec2 delete-security-group --group-name jenkins-sg
+```
+![Deletion of Security Group](screenshots/security-group-deletion.png)
+
+5. Delete Key Pair
+```bash
+aws ec2 delete-key-pair --key-name jenkins-key
+```
+![Deletion of Key Pair](screenshots/key-pair-deletion.png)
+
+6. Also remove locally:
+```bash
+rm -f jenkins-key.pem
+```
+![Local Deletion of Key Pair](screenshots/local-removal-of-key-pair.png)
 ---
 
 # Common Errors and Fixes
@@ -1651,43 +1733,6 @@ You successfully built:
 - Production Apache Web Server
 - Automated GitHub Deployments
 
----
-
-# .gitignore
-
-Create:
-
-```text
-.gitignore
-```
-
-Add:
-
-```gitignore
-
-```
-Cloud / DevOps Engineernode_modules/
-.env
-.DS_Store
-*.pem
-*.log
-coverage/
-dist/
-
-![Setup for .gitignore](screenshots/setup-for-.gitignore.png)
----
-
-## Updating GitHub Repo
-``bash
-git add .
-git commit -m "Update Project" 
-git push origin main
-
-![Setup for .gitignore](screenshots/updating-github-repo.png)
-
-# Cleanup Resources
-
-Terminate EC2 instance after testing to avoid charges.
 
 ---
 
