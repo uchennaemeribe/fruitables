@@ -1231,7 +1231,7 @@ aws route53 change-resource-record-sets --hosted-zone-id Z04577001PKHX4712KXO --
 
 ---
 
-# 7 — Verify Successful DNS Update
+# 6 — Verify Successful DNS Update
 
 Successful output looks like:
 
@@ -1252,7 +1252,7 @@ AWS Route 53 accepted the DNS record.
 ![Successful DNS Update Verification](screenshots/successful-dns-update-verification-status.png)
 ---
 
-# 8 — Wait for DNS Propagation
+# 7 — Wait for DNS Propagation
 
 DNS propagation may take:
 
@@ -1260,7 +1260,7 @@ DNS propagation may take:
 - 5 minutes
 - Sometimes longer
 
-# Verify DNS Propagation Completion
+# 8 - Verify DNS Propagation Completion
 
 After creating your Route 53 DNS records, AWS first sets the status to:
 
