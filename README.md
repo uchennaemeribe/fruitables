@@ -1653,21 +1653,21 @@ git push origin main
 Terminate EC2 instance after testing to avoid charges.
 
 1. Get instance id
-``bash
+```bash
 aws ec2 describe-instances --query "Reservations[*].Instances[*].InstanceId" --output text
-``
+```
 ![Retrieval of EC2 Instance ID](screenshots/instance-id-retrieval.png)
 
 2. Terminate EC2 Instance
-``bash
+```bash
 aws ec2 terminate-instances --instance-ids i-080041005ef5027cd
-``
+```
 ![Termination of EC2 Instance](screenshots/ec2-instance-termination.png)
 
 3. Verify Termination
-``bash
+```bash
 aws ec2 describe-instances --instance-ids i-0abc1234def567890 --query "Reservations[*].Instances[*].State.Name"
-``
+```
 ![Termination of EC2 Instance](screenshots/termination-verified.png)
 
 4.  Delete Security Group
