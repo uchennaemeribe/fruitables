@@ -1047,18 +1047,23 @@ Copy the Route 53 nameservers.
 
 ## Step 35 — Update Domain Registrar Nameservers
 
-1. Go to:
-- QServers
-- Namecheap
-- GoDaddy
 
-Replace existing nameservers with AWS nameservers.
+1. Login to:
+- QServers
+2. Proceed to:
+- My Damin
+2. Click on:
+- My Domain
+
+![Qservers Navigation to Nameservers' Configuration](screenshots/qservers-navigation-to-nameserver.png)
+
+2. Replace existing nameservers with Azure nameservers.
 
 ![Domain Registrar Update Using Nameservers](screenshots/domain-registrar-update-with-nameservers.png)
 
-2. Wait for propagation
+3. Wait for propagation
 
-3. After approximately 10–15 minutes, verify that the domain is now using AWS DNS nameservers.
+4. After approximately 10–15 minutes, verify that the domain is now using Azure DNS nameservers.
 
 Run:
 
@@ -1598,7 +1603,7 @@ Visit:
 ```text
 https://auemeribetech.com.ng/myapp/
 ```
-![HTTPS Verification](screenshots/https-verification.png)
+![HTTPS Verification](screenshots/website-deployment-verification-using-domain-name.png)
 Your website should now be secured.
 
 
