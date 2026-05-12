@@ -1622,7 +1622,6 @@ Create:
 Add:
 
 ```gitignore
-```
 Cloud / DevOps Engineernode_modules/
 .env
 .DS_Store
@@ -1630,6 +1629,7 @@ Cloud / DevOps Engineernode_modules/
 *.log
 coverage/
 dist/
+```
 
 ![Setup for .gitignore](screenshots/setup-for-.gitignore.png)
 
@@ -1744,3 +1744,4 @@ You successfully built:
 # Author
 
 Anthony Uchenna Emeribe
+Cloud / DevOps Engineer
